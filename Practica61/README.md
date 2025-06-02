@@ -59,4 +59,19 @@ Siendo sunetting clásico, entendemos que la red con todo a 1s y todo a 0s no se
  - 220.130.145.011 00000 --> 220.130.145.96
  - 220.130.145.100 00000 --> 220.130.145.128
 
+### Ejercicio 4 
+Se desea crear 254 subredes para conectar 254 máquinas a cada una de ellas a partir
+de la dirección IP de red 135.100.0.0 y máscara 255.255.0.0. ¿Qué máscara de
+subred se emplea para encaminar correctamente datagramas IP a dichas máquinas?
+
+__Solución__
+Para 254 subredes neceesitamos 8 bits (2<sup>8</sup> = 256).  
+La ip 135.x es una clase B, que por tanto tiene máscara 255.255.0.0.   
+Eso nos deja 16 bits de hosts, de los cuales "robamos" 8, quedando 8 bits de host restantes, que permiten direccionar exactamente 254 hosts. Así que se puede hacer. 
+
+Obviamente no vamos a indicar las 254 redes. Excluimos las redes todo a 1s y todos 0s: 
+- la primera red seria 135.100.00000001.0 --> 135.100.1.0
+- la segunda 135.100.2.0
+- la última 135.100.11111110.0 --> 135.100.254.0
+
 
