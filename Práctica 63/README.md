@@ -111,3 +111,147 @@ F. Ninguna de las anteriores
 Las clase B empiezan siempre por 10, así que sólo encaja la C. 
 Van desde la 10_000000 a 10_111111. Es decir, desde 128.x a 191.x. 
 
+## Ejercicio 9. 
+La  empresa  en  la  que  se  desempeña  tiene  asignada  la  dirección  clase  B  172.12.0.0.  De acuerdo a las necesidades planteadas, esta red debería ser dividida en subredes que soporten un  máximo  de  459  nodos  por  subred,  procurando  mantener  en  su  máximo  el  número  de subredes disponibles ¿Cuál es la máscara que deberá utilizar?  
+A. 255.255.0.0  
+B. 255.255.128.0  
+C. 255.255.224.0  
+D. 255.255.254.0  
+E. 255.255.248.0  
+F. 255.255.192.0  
+
+Para 459 hosts necesitamos 9 bits (2<sup>9</sup> = 512 => 510 hosts). 
+
+La máscara de clase B es 255.255.0.0. Es decir, /16
+
+Si reservamos 9 bits para hosts en cada subred nos quedan, nos quedan 23 bits en total para la red. Por tanto, de máscara 255.255.254.0. La opción D. 
+
+## Ejercicio 10 
+Dada la red 192.168.0.0/24, desarrolle un esquema de direccionamiento que cumpla  con los siguientes requerimientos. Use VLSM, es decir, optimice el espacio de  direccionamiento tanto como sea posible.  
+1. Una subred de 20 hosts para ser asignada a la VLAN de Profesores
+2. Una subred de 80 hosts para ser asignada a la VLAN de Estudiantes
+3. Una subred de 20 hosts para ser asignada a la VLAN de Invitados
+4. Tres  subredes de 2 hosts para ser asignada a los enlaces entre enrutadores.
+
+__Solución__
+
+Empezamos siempre por las subredes más grandes, y vamos hacia las más pequeñas. 
+
+ - La VLAN Estudiantes necesita 80 hosts. Por tanto, necesita 7 bits. Nos quedan 25 bits para red + subred. Es decir, una /25. 
+     - Red: 192.168.0.0/25. --> 192.168.0.0_0000000
+     - BC: 192.168.0.0_1111111 --> 192.168.0.127/25
+     - Hosts desde 192.168.0.1/25 hasta 192.168.0.126/26. 
+- Invitados y profesores tienen los mismos requerimientos. Así que vamos con la VLAN Invitados. Necesita 20 hosts. Por tanto, 5 bits para hosts. 27 bits para red. 
+     - Red: 192.168.0.128/27 --> 192.168.0.100_00000
+     - BC: 192.168.0.100_11111 --> 192.168.0.159/27
+     - Hosts desde 192.168.0.129/27 hasta 192.168.0.158/27  
+     _Truco: Si sabes que te da para 32 nodos, sumas 30 a la red y restas 1 (porque empieza en 0) y ya tienes el BC._
+- VLAN Profesores. De nuevo con /27.
+    - Red: 192.168.0.160/27 --> 192.168.0.101_00000
+    - BC: 192.168.0.101_11111 --> 192.168.0.191/27
+    - Hosts desde 192.168.0.161 hasta 192.168.0.190
+- Tres subredes de 2 hosts. Cada una necesita 2 bits para hosts. Es decir, 30 bits para red. /30
+     - Red enlace 1: 
+         - Red: 192.168.0.192/30. 
+         - Hosts: 192.168.0.193/30 y 192.168.0.194/30
+         - BC: 192.168.0.195/30
+     - Red enlace 2:
+         - Red: 192.168.0.196/30
+         - Hosts 192.168.0.197/30 y 192.168.0.198/30
+         - BC: 192.168.0.199/30
+    - Red enlace 3:
+        - Red: 192.168.0.200/30
+        - Hosts 192.168.0.201/30 y 192.168.0.202/30
+        - BC: 192.168.0.203/30
+
+Nos quedan desde 204 en adelante para futuros crecimientos de subredes. 
+
+## Ejercicio 11 
+Dada la situación representada en la figura siguiente:  
+
+a) Asigna una dirección IP válida a aquellas interfaces de red a las que les falte.  
+
+b) Establece unas tablas de encaminamiento para que, simultáneamente:
+- A hable con C y viceversa
+- B hable con E pero no con A
+- C no pueda hablar con D
+
+NOTA: La máscara de subred es 255.255.255.0 en todos los casos.
+
+![enunciado 11](./enunciado_11.jpg)
+
+__Solución__
+
+HAY QUE REVISARLA BIEN, EN CUANTO A LA CONEXIÓN DE D CON DOS ROUTERS DISTINTOS. 
+
+
+Nos dan la máscara. Así que sabemos los rangos de hosts con los que jugar en cada red.
+
+Las direcciones que faltan podrían ser estas:
+
+![Solución 11](./solucion_11.jpg)
+
+Basado en los requisitos del enunciado, las tablas de encaminamiento serán:
+
+Empezamos por los routers
+  
+__Tabla de E__ 
+|Destino       |Máscara       |Gateway        |(Notas                               |
+|--------------|--------------|---------------|-------------------------------------|
+|75.10.4.0     |255.255.255.0 |0.0.0.0        |0.0.0.0 Indica que no tiene GW, pq está conevctada directamente 
+|75.10.5.0     |255.255.255.0 |0.0.0.0        |Bis
+|75.10.3.0     |255.255.255.0 |75.10.5.34     |
+
+__Tabla F__
+|Destino       |Máscara       |Gateway        |(Notas                               |
+|--------------|--------------|---------------|-------------------------------------|
+|75.10.3.0     |255.255.255.0 |0.0.0.0        |
+|75.10.5.0     |255.255.255.0 |0.0.0.0        |
+|75.10.4.0     |255.255.255.0 |75.10.5.12     |
+
+Seguimos con los PCs. 
+
+__Tabla de A__  
+Tiene que poder hablar con C y viceversa. Le permitimos llegar a todos (aunque algunos no podrán responderle).   
+
+|Destino       |Máscara       |Gateway        |(Notas                               |
+|--------------|--------------|---------------|-------------------------------------|
+|75.10.4.0     |255.255.255.0 |75.10.4.1      |Por si se añaden otros PCs en la red. No es necesaria |
+|0.0.0.0       |0.0.0.0       |75.10.4.1      |Salida por defecto. Para Internet u otras
+
+__Tabla de B__  
+Tiene que poder hablar con E, pero no con A. Por tanto, no debe conocer la red de A.
+
+|Destino       |Máscara       |Gateway        |(Notas                               |
+|--------------|--------------|---------------|-------------------------------------|
+|75.10.3.0     |255.255.255.0 |75.10.3.1      |Le permite comunicarse con D         |
+|75.10.5.0     |255.255.255.0 |75.10.3.1      |Bus con E                            |
+
+No le incluimos ruta por defecto 0.0.0.0, porque si no incluiría la ruta de A en ella
+
+__Tabla de C__   
+No puede hablar con D. Así que le damos todas las rutas menos la de la red de D (75.10.5.0)  
+
+|Destino       |Máscara       |Gateway        |(Notas                               |
+|--------------|--------------|---------------|-------------------------------------|
+|75.10.3.0     |255.255.255.0 |75.10.3.1      |Le permite comunicarse con B         |
+|75.10.4.0     |255.255.255.0 |75.10.3.1      |Bis con A                            |
+
+__Tabla de D__ 
+No indica requisitos específicos. Pero entendemos que podrá hablar con todos, salvo los que no pueden hablar con él, que no le podrán responder. 
+
+|Destino       |Máscara       |Gateway        |(Notas                               |
+|--------------|--------------|---------------|-------------------------------------|
+|75.10.4.0     |255.255.255.0 |75.10.5.12     |Le permite comunicarse con A         |
+|0.0.0.0       |0.0.0.0       |75.10.5.34     |Default para hablar con B y C        |
+
+Nota: En la topología del ejercicio, se asume que entre el PC D y los routers E y F debe haber un switch que segmenta la red 75.10.5 en dos vlans. 
+
+
+
+
+
+
+
+
+
