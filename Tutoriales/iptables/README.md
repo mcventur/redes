@@ -123,37 +123,37 @@ Una vez definida la regla, toca indicar la acción a ejecutar sobre el paquete s
 - **REJECT**: Se elimina el paquete, pero en este caso se notifica al host de origen con un paquete ICMP. Se pueden indicar los motivos con `--reject-with respuesta`, con respuesta posible: `icmp-host-unreachable`, `icmp-port-unreachable`, etc.
 - **DNAT**: Esta acción es utilizada en la cadena PREROUTING de la tabla NAT para modificar la IP de destino. Tiene que llevar asociado el parámetro `--to-destination`, que puede incluir también el puerto.
 
-```bash
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.1.10:80
-```
+  ```bash
+  sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.1.10:80
+  ```
 
-**Uso típico**: Cuando tenemos un servidor web en una LAN privada. Traduciremos en PREROUTING todas las solicitudes a la IP pública al puerto 80 (o el 443) por la IP privada del servidor.
+  **Uso típico**: Cuando tenemos un servidor web en una LAN privada. Traduciremos en PREROUTING todas las solicitudes a la IP pública al puerto 80 (o el 443) por la IP privada del servidor.
 
 - **SNAT**: Acción asociada en la cadena POSTROUTING para modificar la IP origen por una IP de destino fija. Al igual que el caso anterior, le tiene que acompañar el parámetro `--to`. Ejemplo:
 
-```bash
-iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to 203.0.113.1
-```
+  ```bash
+  iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to 203.0.113.1
+  ```
 
 - **MASQUERADE**: Acción equivalente a SNAT pero utilizada cuando tenemos una dirección IP dinámica en la interfaz de salida. Es un poco más lento ya que comprueba la IP de la interfaz de salida para cada paquete. Ejemplo:
 
-```bash
-iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
-```
+  ```bash
+  iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
+  ```
 
-**Uso típico**: Equipos de nuestra red que salen a internet para conectarse con servidores externos (web, ftp u otro tipo). Traduciremos en POSTROUTING (el destino no cambia) la IP privada de origen de todas las solicitudes dirigidas a los puertos correspondientes (80, 21, 22) por la IP pública.  
-Al usar SNAT o MASQUERADE, el propio iptables se encarga de realizar la traducción inversa NAT de la respuesta recibida, mediante una tabla de correspondencia que almacena.
+  **Uso típico**: Equipos de nuestra red que salen a internet para conectarse con servidores externos (web, ftp u otro tipo). Traduciremos en POSTROUTING (el destino no cambia) la IP privada de origen de todas las solicitudes dirigidas a los puertos correspondientes (80, 21, 22) por la IP pública.
+
+  Al usar SNAT o MASQUERADE, el propio iptables se encarga de realizar la traducción inversa NAT de la respuesta recibida, mediante una tabla de correspondencia que almacena.
 
 - **REDIRECT**: Se utiliza en la cadena PREROUTING para modificar la dirección IP que tenga la interfaz de red de entrada.
 
-## Notas
-En general, actuamos sobre la IP de destino en PREROUTING, antes de enrutar (después no tendría sentido). Y actuamos sobre la IP de origen en el POSTROUTING, cuando los paquetes ya han sido enrutados y tienen el destino definitivo.
+  > Nota: En general, actuamos sobre la IP de destino en PREROUTING, antes de enrutar (después no tendría sentido). Y actuamos sobre la IP de origen en el POSTROUTING, cuando los paquetes ya han sido enrutados y tienen el destino definitivo.
 
 - **LOG**: Registra las conexiones que encajan con el filtro indicado en el log del sistema (normalmente `/var/log/syslog`). Se puede añadir un prefijo al log para facilitar su filtrado con `--log-prefix`. Ejemplo:
 
-```bash
-iptables -A INPUT -p tcp --dport 22 -j LOG --log-prefix "SSH connection attempt: "
-```
+  ```bash
+  iptables -A INPUT -p tcp --dport 22 -j LOG --log-prefix "SSH connection attempt: "
+  ```
 
 - **RETURN**: El paquete dejará la cadena en la que se encuentre, pero continuará por la cadena superior a esa si es que existe.
 - **MARK**: Establece marcas en el paquete. Sólo es válido en la tabla mangle, pero no fuera de ella.
