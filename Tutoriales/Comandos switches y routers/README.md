@@ -25,10 +25,11 @@ Switch#show vlan brief
 Para asignar interfaces a las vlans, accedemos a la interface desde el modo config, y usamos el comando switchport access:
 ```
 Switch(config)#interface FastEthernet 0/1
+Switch(config-if)#switchport mode access !Para activar el acceso de una única vlan a ese puerto
 Switch(config-if)#switchport access vlan 30
 ```
 
-Haríamos lo propio con cada interface que queramos mover asignar a una vlan. 
+Haríamos lo propio con cada interface que queramos asignar a una vlan. 
 
 ## Modo trunk
 
