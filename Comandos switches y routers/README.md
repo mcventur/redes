@@ -147,7 +147,7 @@ Router1(config)#crypto key generate rsa
 
 Y para que use la versión 2 de SSH, más segura:
 ```
-ip ssh version 2
+Router1(config)#ip ssh version 2
 ```
 
 podemos configurar otros parámetros, como el timeout o los intentos de login permitidos:
