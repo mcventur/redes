@@ -42,7 +42,7 @@ Para modificar ciertos flags, marcas u opciones avanzadas en los paquetes: TOS, 
 Cuenta con las cadenas INPUT, OUTPUT, PREROUTING, POSTROUTING y FORWARD.
 
 ## Flujo de un paquete
-El flujo que sigue un paquete sería:
+El flujo que sigue un paquete sería:  
 ![alt text](image.png)
 
 **Ejemplo**: Un paquete que se origina en nuestra red local y va destinado a una máquina de Internet:
