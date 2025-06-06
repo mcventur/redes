@@ -34,7 +34,7 @@ Haríamos lo propio con cada interface que queramos mover asignar a una vlan.
 
 Si una interfaz dada del switch transporta tráfico de varias vlan (distintas subredes segmentadas), entonces esa interfaz debe configurarse en modo trunk. Por ejemplo, en la siguiente imagen, la interfaz Fa0/3, que va al router:
 
-![alt text](image.png)
+![esquema](./esquema.png)
 
 Para ello, en la configuración de la interface usamos el comando switchport mode trunk
 
