@@ -162,6 +162,35 @@ SSH Enabled - version 2.0
 Authentication timeout: 60 secs; Authentication retries: 3
 ```
 
+## Configurar router como servidor DHCP
+Vemos cómo configurar un router Cisco para que haga de servidor DHCP en una red LAN. 
+
+1. Activamos el servicio
+    ```
+    Router(config)#service dhcp
+    ```
+2. Damos un nombre a la cola de direccionamiento
+    ```
+    Router(config)#ip dhcp pool PAR_LAN
+    ```
+    Al hacer esto ya se pasa al modo de configuración del pool dhcp  
+
+3. Indicamos el rango de direcciones
+    ```
+    Router1(dhcp-config)#network 192.168.1.0 255.255.255.0
+    ```
+4. Indicamos la puerta de enlace que se entrega a los clientes
+    ```
+    Router1(dhcp-config)#default-router 192.168.1.1
+    ```
+5. Indicamos el servidor DNS a entregar
+    ```
+    Router1(dhcp-config)#dns-server 192.168.1.2
+    ```
+6. Podemos excluir direcciones reservadas de la asignación (en modo config general)
+    ```
+    Router(config)#ip dhcp excluded-address 192.168.1.1 192.168.1.5
+    ```
 
 
 
