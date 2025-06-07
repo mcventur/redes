@@ -369,6 +369,41 @@ Routing Protocol is "ospf 1"
   ...
 ```
 
+### Eleccion de DR y DBR (Designated Router y Designated Backup Router)
+Cuando varios routers OSPF están conectados en un mismo segmento de red (como una LAN Ethernet), la forma en que comparten esta información puede volverse ineficiente si no se optimiza. Aquí es donde entran en juego el DR y el BDR.
 
+Por ejemplo, en la imagen siguiente:
+- Existen más de 2 routers en una misma red, conectados a través de un Switch, sin vlans.
+- Todos los routers comunicarían sus registros OSPF con todos.
+
+![alt text](image-2.png)
+
+En redes de accesos múltiples como el de la figura, OSPF elige un DR y un DBR para que funcionen como puntos de recolección de y distribución de los registros de la bdd ospf (LSBD), que constituye su tabla de rutas. El BDR entra en juego si falla el DR. 
+
+Al hacerlo, se simplifican y diminuyen los mensajes y solicitudes OSPF:
+
+![alt text](image-3.png)
+
+Al resto de routers de la red multiacceso se les denomina DROthers. 
+
+Para elegir un DR y BDR el proceso es el siguiente:
+- Los routers de la red se presentan e intercambian sus prioridades e ids ospf. 
+- El router con la prioridad más alta se elige como DR. En caso de empate, el que tenga el router id mayor.
+- Entre los routers restantes, se elige como BDR el de mayor prioridad, o en caso de empate, el de mayor ID. 
+
+En la ilustración, todas las interfaces Ethernet del router tienen una prioridad determinada de 1. Como resultado, para seleccionar el DR y el BDR se usa la ID del router OSPF. El R3, con la ID de router más alta, se convierte en el DR, y el R2, que tiene la segunda ID de router más alta, se convierte en el BDR.
+
+![alt text](image-5.png)
+
+Las prioridades se asignan a cada interfaz, de 1 a 255, siendo por defecto 1. 
+
+Si se asigna 0 entonces ese router no puede ser designado DR ni BDR en la red propia de esa interfaz. 
+
+Para cambiar la prioridad de una interfaz
+```
+Router(config)#interface Se0/3/0
+Router(config-if)#ip ospf priority 255
+Router(config-if)#end
+```
 
 
