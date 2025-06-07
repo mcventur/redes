@@ -76,7 +76,7 @@ Ilustramos el proceso con la MAC 52:74:f2:b1:a8:7f
 3. Pasamos el segundo dígito hexadecimal a binario para el paso 3:  
     5 __0010__:74:f2:ff:f3:b1:a8:7f
 4. Invertimos el 7º bit (3º del segundo dígito hexadecimal):  
-    __0000__:74:f2:ff:f3:b1:a8:7f
+    5 __0000__:74:f2:ff:f3:b1:a8:7f
 5. Volvemos a pasar a hexadecimal y agrupamos en hextetos.  
     __5074:f2ff:f3b1:a87f__
 
