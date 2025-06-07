@@ -192,6 +192,11 @@ Vemos cómo configurar un router Cisco para que haga de servidor DHCP en una red
     ```
     Router(config)#ip dhcp excluded-address 192.168.1.1 192.168.1.5
     ```
+    Permite excluir también rangos de direcciones
+    `ip dhcp excluded-address <start address> [<end address>]`. Por ejemplo:
+    ```
+    Router(config)#ip dhcp excluded address 192.168.0.200 192.168.0.254
+    ```
 
 
 
