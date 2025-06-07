@@ -199,4 +199,176 @@ Vemos cómo configurar un router Cisco para que haga de servidor DHCP en una red
     ```
 
 
+## Listas de Acceso (ACL)
+Podemos crear listas de acceso estándar y extendidas para usar el router como cortafuegos. 
+
+### ACL estándar
+Se numeran de 1 a 99 y sólo permiten indicar la dirección de origen. Para ello, se usa una máscara wildcard (justo al revés que la máscara de red).
+
+Se definen con el comando `access-list <num> {deny|permit} <host> <wildcard>`. Por ejemplo: 
+
+```
+Router(config)#access-list 1 permit 192.168.4.0 0.0.0.255
+Router(config)#access-list 1 permit 192.168.6.0 0.0.0.255
+Router(config)#access-list 1 deny any
+```
+Una vez creada la ACL, se debe asignar al menos a una interfaz, para filtrar tráfico entrante o saliente. Se hace en modo de configuración de la interfaz correspondiente con el comando `ip access-group <num-ACL> {in|out}`. Por ejemplo:
+
+```
+Router(config-if)#ip access-group 1 out
+```
+
+### ACL extendida
+Las ACL extendidas se  numeran entre 100 y 199 y permiten indicar protocolos, puertos y direcciones de destino entre otros. 
+
+Su sintaxis general de definición es:
+```
+Router(config)# access-list <num> {deny | permit} 
+protocol source source-wildcard [operator {port}] destination destination-wildcard [operator {port}]
+```
+El operator que se aplica al puerto puede ser cualquier operador de comparación, como __lt__ (menor que), __gt__ (mayor que), __eq__ (equal), __neq__ (not equal), y a continuación el puerto.
+
+Para aplicarlo a una interfaz se usa el mismo comando que en las ACL estándar. 
+
+Un ejemplo:
+```
+R1(config)# access-list 110 permit tcp 192.168.10.0 0.0.0.255 any eq 443
+R1(config)# interface g0/0/0
+R1(config-if)# ip access-group 110 in
+R1(config-if)# exit
+```
+
+# Protocolos de enrutamiento
+
+Para ver los protocolos de enrutamiento dinámico activos usaremos el comando `show ip protocols`
+
+Usaremos el siguiente esquema para ejemplificar la configuración de protocolos
+
+![alt text](image-1.png)
+
+
+## Protocolo RIP
+Para habilitar RIP en su versión 2. 
+
+Lo vemos en el router MADRID:
+```
+Router(config)#router rip
+Router(config-router)#version 2
+Router(config-router)#network 192.168.0.0
+Router(config-router)#network 10.10.10.0
+Router(config-router)#network 10.10.10.16
+Router(config-router)#passive-inteface gig0/0
+```
+Se habilita rip, y en la configuración del protocolo se se indican las redes conectadas, sin máscara, y la versión 2.   
+
+También hemos indicado una interface pasiva, la que apunta de cada al interior de la red, porque no hay rutas por esa interfaz que requieran recibir actualizaciones rip. Así evitamos introducir en esa red mensajes inútiles. 
+
+Otro ejemplo, en el router SEVILLA
+```
+Router(config)#router rip
+Router(config-router)#version 2
+Router(config-router)#network 192.168.2.0
+Router(config-router)#network 10.10.10.16
+Router(config-router)#network 10.10.10.8
+Router(config-router)#passive-interface gi0/0
+```
+
+Y en BARCELONA
+```
+Router(config)#router rip
+Router(config-router)#version 2
+Router(config-router)#network 192.168.1.0
+Router(config-router)#network 10.10.10.0
+Router(config-router)#network 10.10.10.8
+Router(config-router)#passive-interface gi0/0
+```
+
+Para mostrar la configuracion de rip usaremos el comando `show ip rip`
+
+## Protocolo OSPF
+
+OSPF es más moderno que rip y usa métricas mas complejas y avanzadas, y mecanismos de sincronización más optimizados. 
+
+```
+Router(config)#router ospf 1
+Router(config-router)#network 192.168.0.0 0.0.0.255 area 0
+Router(config-router)#network 10.10.10.0 0.0.0.3 area 0
+Router(config-router)#network 10.10.10.16 0.0.0.3 area 0
+```
+
+- En el primer comando activamos ospf y le damos un id de proceso ospf, que es un id local y no tiene que coincidir con el resto. 
+- En los siguientes comandos le indicamos las redes que queremos que sea capaz de almacenar y comunicar a otros routers OSPF. La ma´scara en formato wildcard, y el área. 
+- Si sólo hay un área, se recomienda que sea la 0 por si crece. Si hay varias, una tiene que ser la 0 (backbone). El área sí debe ser común en todos los routers que comparten área. 
+
+Adicionalmente podemos indicar la id ospf del router con
+```
+router-id 1.1.1.1
+```
+Se da como si fuese una ip. Si no se la indicamos, usará la ip loopback más alta, o la ip de interfaz más alta. 
+En el router MADRID no se la he puesto y al ejecutar show ip ospf muestra:
+```
+Router#show ip ospf
+ Routing Process "ospf 1" with ID 192.168.0.1
+ ...
+```
+Hacemos lo propio en el resto de routers. 
+
+SEVILLA:
+```
+Router(config)#router ospf 1
+Router(config-router)#router-id 2.2.2.2
+Router(config-router)#network 10.10.10.16 0.0.0.3
+Router(config-router)#network 10.10.10.8 0.0.0.3 area 0
+Router(config-router)#network 192.168.2.0 0.0.0.255 area 0
+```
+En este caso le he dado un id ospf manual. 
+
+BARCELONA
+```
+Router(config)#router ospf 1
+Router(config-router)#network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)#network 10.10.10.0 0.0.0.3 area 0
+Router(config-router)#network 10.10.10.8 0.0.0.3 area 0
+```
+
+Si cambiamos el id ospf de un router, desde el modo privilegiado ejecutamos lo siguiente para resetear el proceso ospf (recargarña las tablas y registros correspondientes).
+
+Por ejemplo, en Sevilla he hecho:
+```
+Router(config)#router ospf 1
+Router(config-router)#router
+Router(config-router)#router-id 3.3.3.3
+Router(config-router)#exit
+```
+
+Y como se observa, no se ha refrescado esa información:
+```
+Router#show ip protocols
+
+Routing Protocol is "ospf 1"
+  Outgoing update filter list for all interfaces is not set 
+  Incoming update filter list for all interfaces is not set 
+  Router ID 2.2.2.2
+  ...
+```
+
+Así que ejecutamos el comando de reseteo del proceso ospf:
+```
+Router#clear ip ospf process
+Reset ALL OSPF processes? [no]: yes
+```
+
+lo que refrescará el id al nuevo:
+```
+Router#show ip protocols
+
+Routing Protocol is "ospf 1"
+  Outgoing update filter list for all interfaces is not set 
+  Incoming update filter list for all interfaces is not set 
+  Router ID 3.3.3.3
+  ...
+```
+
+
+
 
