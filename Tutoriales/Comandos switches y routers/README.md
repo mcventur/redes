@@ -238,7 +238,7 @@ R1(config-if)# ip access-group 110 in
 R1(config-if)# exit
 ```
 
-# Protocolos de enrutamiento
+## Protocolos de enrutamiento
 
 Para ver los protocolos de enrutamiento dinámico activos usaremos el comando `show ip protocols`
 
@@ -247,7 +247,7 @@ Usaremos el siguiente esquema para ejemplificar la configuración de protocolos
 ![alt text](image-1.png)
 
 
-## Protocolo RIP
+### Protocolo RIP
 Para habilitar RIP en su versión 2. 
 
 Lo vemos en el router MADRID:
@@ -285,7 +285,7 @@ Router(config-router)#passive-interface gi0/0
 
 Para mostrar la configuracion de rip usaremos el comando `show ip rip`
 
-## Protocolo OSPF
+### Protocolo OSPF
 
 OSPF es más moderno que rip y usa métricas mas complejas y avanzadas, y mecanismos de sincronización más optimizados. 
 
@@ -369,7 +369,7 @@ Routing Protocol is "ospf 1"
   ...
 ```
 
-### Eleccion de DR y DBR (Designated Router y Designated Backup Router)
+### Eleccion de DR y DBR (Designated Router y Designated Backup Router) en OSPF
 Cuando varios routers OSPF están conectados en un mismo segmento de red (como una LAN Ethernet), la forma en que comparten esta información puede volverse ineficiente si no se optimiza. Aquí es donde entran en juego el DR y el BDR.
 
 Por ejemplo, en la imagen siguiente:
@@ -405,5 +405,24 @@ Router(config)#interface Se0/3/0
 Router(config-if)#ip ospf priority 255
 Router(config-if)#end
 ```
+
+## Interfaces loopback
+Las interfaces loopback son interfaces lógicas del router que no se asignan a puertos físicos y por tanto no se pueden conectar a otro dispositivo.   
+Son útiles para probar y administrar dispositivos.   
+El proceso de habilitación y asignación de una dirección de loopback es simple:
+```
+Router(config)# interface loopback number
+Router(config-if)# ip address <ip-address> <subnet-mask>
+Router(config-if)# exit
+```
+
+## Enrutamiento estático
+
+Se definen con el comando `ip route`:
+```
+Router(config)#ip route 192.160.2.0 255.255.255.0 192.168.3.2
+Router(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.20
+```
+La segunda seria una ruta predeterminada o por defecto, para paquetes que no encajen en las anteriores. 
 
 
