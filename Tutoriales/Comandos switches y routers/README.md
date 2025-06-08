@@ -212,6 +212,8 @@ Router(config)#access-list 1 permit 192.168.4.0 0.0.0.255
 Router(config)#access-list 1 permit 192.168.6.0 0.0.0.255
 Router(config)#access-list 1 deny any
 ```
+>__OJO!!!:__ En el ejemplo anterior la tercera regla no es necesaria, porque __POR DEFECTO UNA ACL IMPIDE TODO EL TRÁFICO__. Es decir, que si las reglas previas fuesen _deny_, habría que añadir al final una _permit_ any para que no bloquee todo el tráfico.  
+
 Una vez creada la ACL, se debe asignar al menos a una interfaz, para filtrar tráfico entrante o saliente. Se hace en modo de configuración de la interfaz correspondiente con el comando `ip access-group <num-ACL> {in|out}`. Por ejemplo:
 
 ```
@@ -226,6 +228,8 @@ Su sintaxis general de definición es:
 Router(config)# access-list <num> {deny | permit} 
 protocol source source-wildcard [operator {port}] destination destination-wildcard [operator {port}]
 ```
+__Importante:__ Por defecto la regla general aplicada en las ACL extendidas deniega todo. Sería `deny ip any any`. Importante porque implica que hay que permitir explícitamente el tráfico que nos interese si las reglas iniciales son de tipo _deny_. 
+
 El operator que se aplica al puerto puede ser cualquier operador de comparación, como __lt__ (menor que), __gt__ (mayor que), __eq__ (equal), __neq__ (not equal), y a continuación el puerto.
 
 Para aplicarlo a una interfaz se usa el mismo comando que en las ACL estándar. 
