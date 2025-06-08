@@ -238,6 +238,8 @@ R1(config-if)# ip access-group 110 in
 R1(config-if)# exit
 ```
 
+Protocolo, dirección de origen y de destino son obligatorios. Como protocolo se puede indicar _ip_ si se quiere usar uno genérico. Y como direcciones se permite el uso de _any_
+
 ## Protocolos de enrutamiento
 
 Para ver los protocolos de enrutamiento dinámico activos usaremos el comando `show ip protocols`
